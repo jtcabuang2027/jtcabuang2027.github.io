@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Rusty Forge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Jaro:opsz@6..72&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shopstyle.css">
+</head>
+<!--Shop item images were taken from the Roblox catalog-->
+<body>
+    <div class="container">
+        <header>
+            <h1>The Rusty Forge</h1>
+            <div class="shopping">
+                <img src="Media/scicon.png" alt="Shopping Cart">
+                <span class="quantity">0</span>
+            </div>
+        </header>
+        <div class="list"></div>
+    </div>
+    <div class="cart">
+        <h1>Shopping Cart</h1>
+        <div class="cart-items-container">
+            <ul class="listcart"></ul>
+        </div>
+        <div class="checkout">
+            <div class="total">Total: <span id="totalPrice">0</span></div>
+            <button onclick="clearCart()" id="clearCart">Clear Cart</button>
+            <button onclick="openPopup()" id="Checkout">Checkout</button>
+            <div class="closeShopping">Close</div>
+        </div>
+
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2>Wait! For whom is this for?</h2>
+                <form id="checkoutForm" action="http://sirjm.infinityfreeapp.com/checkout.php" method="GET">
+                    <label for="cust_name">Name:</label>
+                    <input type="text" id="cust_name" name="cust_name" required>
+                    <br>
+                    <br>
+                    <label for="cust_addr">Address:</label>
+                    <input type="text" id="cust_addr" name="cust_addr" required>
+                    <br>
+                    <br>
+                    <label for="cust_email">Email:</label>
+                    <input type="email" id="cust_email" name="cust_email" required>
+                    <br>
+                    <br>
+                    <input type="hidden" id="cust_order" name="cust_order">
+                    <button type="button" onclick="submitForm()">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let openshopping = document.querySelector('.shopping');
+        let closeshopping = document.querySelector('.closeShopping');
+        let list = document.querySelector('.list');
+        let listcart = document.querySelector('.listcart');
+        let body = document.querySelector('body');
+        let totalPriceElement = document.getElementById('totalPrice');
+        let quantity = document.querySelector('.quantity');
+    
+        openshopping.addEventListener('click', () => {
+            body.classList.add('active');
+        });
+    
+        closeshopping.addEventListener('click', () => {
+            body.classList.remove('active');
+        });
+    
+        let products = [
+            {
+                id: 1,
+                name: 'Wooden Sword',
+                type: 'Melee',
+                description: 'A simple sword. Not the best for fighting, but maybe as for fuel instead.',
+                image: 'Media/sword1.png',
+                price: 25
+            },
+            {
+                id: 2,
+                name: 'Windsword',
+                type: 'Melee',
+                description: 'A sword enchanted with the ability to take your enemies off their feet.',
+                image: 'Media/sword2.png',
+                price: 75
+            },
+            {
+                id: 3,
+                name: 'Sunblade',
+                type: 'Melee',
+                description: 'Forged with the dusty wind and firey sun, this blade can mar things beyond repair!',
+                image: 'Media/sword3.png',
+                price: 150
+            },
+            {
+                id: 4,
+                name: 'Oathbreaker',
+                type: 'Melee',
+                description: 'Once a divine blade wielded by a powerful paladin, its promise has been broken and must be redeemed for a new blessing.',
+                image: 'Media/sword4.png',
+                price: 500
+            },
+            {
+                id: 5,
+                name: 'Luminiar',
+                type: 'Melee',
+                description: 'Mages marvel at the sight of this one. Its ability to harness the powers of the celestial realm are beyond comprehension.',
+                image: 'Media/sword5.png',
+                price: 1300
+            },
+            {
+                id: 6,
+                type: 'Melee',
+                name: 'Tidal Weaver',
+                description: 'Avast ye! Harness the power of the oceans with this finely crafted sword that can wash out anyone who dares oppose you.',
+                image: 'Media/sword6.png',
+                price: 1500
+            },
+            {
+                id: 7,
+                type: 'Ranged',
+                name: 'Wooden Bow',
+                description: 'A simple bow perfect for those starting off their journey to become a legendary archer. The rope could break after a while and may be an inconvenience...',
+                image: 'Media/bow1.png',
+                price: 25
+            },
+            {
+                id: 8,
+                type: 'Ranged',
+                name: 'Bow of Breath',
+                description: 'Talk about knockback! Though not as tornado-hurling as other weapons from the skies, it can still deal a hefty amount of damage.',
+                image: 'Media/bow2.png',
+                price: 75
+            },
+            {
+                id: 9,
+                type: 'Ranged',
+                name: 'Lethal Longbow',
+                description: 'Forged by a blacksmith residing in the toxic wasteland of Ahyalum, it will definetly leave your opponents desperate for a constant healing source.',
+                image: 'Media/bow3.png',
+                price: 150
+            },
+            {
+                id: 10,
+                type: 'Ranged',
+                name: 'Forest Fury',
+                description: 'An intricate bow that has been blessed by the elves and fairies of Mother Nature. Be sure to not set ANY LIVING THING on fire, okay?',
+                image: 'Media/bow4.png',
+                price: 500
+            },
+            {
+                id: 11,
+                type: 'Ranged',
+                name: 'Bow of Heroes',
+                description: 'Notable saviors of the land have wielded this once. Or twice. Or THRICE! It is said to grant the wielder with the best of luck in their battles.',
+                image: 'Media/bow5.png',
+                price: 1300
+            },
+            {
+                id: 12,
+                type: 'Ranged',
+                name: 'Present Opener',
+                description: 'Hello? Santa? You accidentally gave a present to someone on the naughty list? Oh no worries! Let me just get this real quick.. and yes it turns whatever is inside into coal.',
+                image: 'Media/bow6.png',
+                price: 1500
+            },
+            {
+                id: 13,
+                type: 'Staff',
+                name: 'Staff of Scholars',
+                description: 'A simple yet well-crafted staff suitable for those who wish to learn the arts of the arcane. Better not break it though.. enchanted wood is expensive nowadays!',
+                image: 'Media/staff1.png',
+                price: 50
+            },
+            {
+                id: 14,
+                type: 'Staff',
+                name: 'Orbital Caster',
+                description: 'A thinner yet stronger staff a more proficient mage may wield. With enough of these, it could control the trajectory of an avalanche!',
+                image: 'Media/staff2.png',
+                price: 100
+            },
+            {
+                id: 15,
+                type: 'Staff',
+                name: 'Blessed by Nature',
+                description: 'The enchanters of the forest could not think of a better name for this. Regardless, it must be EMPHASIZED that you DO NOT BURN DOWN ANY LIVING THING on FIRE.',
+                image: 'Media/staff3.png',
+                price: 175
+            },
+            {
+                id: 16,
+                type: 'Staff',
+                name: 'Necromancer Nightstick',
+                description: 'The gods had no hand in the creation of this abhorrence. Its ability to revive the dead is a curse, a mockery of life itself. Be wary of the evil that stems from within.',
+                image: 'Media/staff4.png',
+                price: 550
+            },
+            {
+                id: 17,
+                type: 'Staff',
+                name: 'Lightning Lathe',
+                description: 'Fireballs are for AMATEURS! LIGHTNING BOLT! LIGHTNING BALL! LIGHTNING EVERYTHING! Only mad wizards have the guts to use this to its full extent!',
+                image: 'Media/staff5.png',
+                price: 1450
+            },
+            {
+                id: 18,
+                type: 'Staff',
+                name: 'Bane of Skies',
+                description: 'Imbued with the touch of several gods, this staff could rule over a nation with the power it possesses, assuming it falls into the right hands that is.',
+                image: 'Media/staff6.png',
+                price: 1999
+            },
+            {
+                id: 19,
+                type: 'Potion',
+                name: 'Herbal Stock',
+                description: 'Grandma said that her medicine would fix my dislocated bone. She was wrong of course, but it did help with my not-so-deep wounds from a couple of goblins.',
+                image: 'Media/pot1.png',
+                price: 15
+            },
+            {
+                id: 20,
+                type: 'Potion',
+                name: 'Healing Potion',
+                description: 'Dad said that this potion he bought from a friend would fix my dislocated bone this time. He was also wrong, but it did help with the nasty bite I got from a mimic.',
+                image: 'Media/pot2.png',
+                price: 25
+            },
+            {
+                id: 21,
+                type: 'Potion',
+                name: 'Flask of Frost',
+                description: 'Ice ice baby! This icy, minty, refreshing flask can turn you into a makeshift mage of the north. Just be sure to not use any fire-related items along with it!',
+                image: 'Media/pot3.png',
+                price: 50
+            },
+            {
+                id: 22,
+                type: 'Potion',
+                name: 'Suspicious Sriracha',
+                description: 'When they said to not put too much hot sauce, they were not joking at all. This is banned in several taverns for its explosive and heated effect!',
+                image: 'Media/pot4.png',
+                price: 75
+            },
+            {
+                id: 23,
+                type: 'Potion',
+                name: 'Bludgeoning Bottle',
+                description: 'I... would like... TO RAGEEEEE!!!!! It would be quite the interesting sight to see a fairy use this. Actually, that would just look like an aggresive fly buzzing about.',
+                image: 'Media/pot5.png',
+                price: 100
+            },
+            {
+                id: 24,
+                type: 'Potion',
+                name: 'Totally Normal Can of Beans',
+                description: 'Out of all the items here.. and you chose this? You are either incredibly intelligent or another warlock in the making. Please do not hurt me I have a family to feed. :(',
+                image: 'Media/pot6.png',
+                price: 99999
+            },
+        ];
+        let listcarts = [];
+        function initApp() {
+            products.forEach((value, key) => {
+                let newDiv = document.createElement('div');
+                newDiv.classList.add('item');
+                newDiv.innerHTML = `
+                    <img src="${value.image}"/>
+                    <div class="title">${value.name}</div>
+                    <div class="type">${value.type}</div>
+                    <div class="description">${value.description}</div>
+                    <div class="price">${value.price.toLocaleString()}</div>
+                    <button onclick="addtocart(${key})">ADD TO CART</button>
+                `;
+                list.appendChild(newDiv);
+            });
+        }
+        initApp();
+    
+        function addtocart(key) {
+            let item = products[key];
+            let newItem = {
+                prod_name: item.name,
+                prod_price: item.price,
+                image: item.image
+            };
+
+            listcarts.push(newItem);
+            reloadcart();
+        }
+
+        function clearCart() {
+            listcarts = [];
+            reloadcart();
+        }
+
+        function removeFromCart(index) {
+            listcarts.splice(index, 1);
+            reloadcart();
+        }
+    
+        function reloadcart() {
+            listcart.innerHTML = '';
+            let totalprice = 0;
+
+            listcarts.forEach((value, index) => {
+                totalprice += value.prod_price;
+
+                if (value != null) {
+                    let newDiv = document.createElement('li');
+                    newDiv.innerHTML = `
+                        <div><img src="${value.image}" style="max-width: 100px; height: auto;"/></div>
+                        <div>${value.prod_name}</div>
+                        <div>${value.prod_price.toLocaleString()}</div>
+                        <button onclick="removeFromCart(${index})">Remove</button>
+                    `;
+                    listcart.appendChild(newDiv);
+                }
+            });
+            totalPriceElement.innerText = totalprice.toLocaleString();
+            quantity.innerText = listcarts.length;
+        }
+    
+        function openPopup() {
+            document.getElementById("popup").style.display = "block";
+        }
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        function submitForm() {
+            const cust_name = document.getElementById('cust_name').value;
+            const cust_addr = document.getElementById('cust_addr').value;
+            const cust_email = document.getElementById('cust_email').value;
+            const cust_order = JSON.stringify(listcarts);
+            
+            document.getElementById('cust_order').value = cust_order;
+
+            document.getElementById('checkoutForm').submit();
+        }
+    </script>
+</body>
+
+</html>
